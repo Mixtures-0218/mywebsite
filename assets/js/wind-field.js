@@ -146,22 +146,24 @@
     var vx = field.x * CONFIG.baseSpeed;
     var vy = field.y * CONFIG.baseSpeed;
 
-    // 2. 光标涡旋叠加（Rankine，逆时针）
-    if (mouse.active) {
-      var dx = this.x - mouse.x;
-      var dy = this.y - mouse.y;
+    // 2. 涡旋叠加（Rankine，逆时针）
+    //    涡旋中心 = 光标静止位置（vortexX/vortexY），强度 = vortexIntensity（0~1 平滑渐变）
+    //    光标移动时涡旋强度快速消散，不会出现"跟在光标后疯转"的效果
+    if (mouse.active && mouse.vortexIntensity > 0.01) {
+      var dx = this.x - mouse.vortexX;
+      var dy = this.y - mouse.vortexY;
       var dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist < CONFIG.mouseRadius) {
         var falloff = 1 - fade(dist / CONFIG.mouseRadius); // 边缘平滑过渡
         var swirl = swirlVelocity(dx, dy, dist);
-        var strength = falloff * 1.6; // 涡旋主导背景流场
+        var strength = falloff * 1.6 * mouse.vortexIntensity; // 涡旋主导背景流场（乘强度渐入）
 
         vx += swirl.x * strength;
         vy += swirl.y * strength;
 
         // 涡旋区内粒子稍亮，突出台风眼壁结构（仍低于易读性上限）
-        this.alpha = Math.min(CONFIG.maxAlpha * 1.35, this.alpha + 0.004);
+        this.alpha = Math.min(CONFIG.maxAlpha * 1.35, this.alpha + 0.004 * mouse.vortexIntensity);
       } else {
         // 离开涡旋区后 alpha 缓慢回归基线
         this.alpha += (this.baseAlpha - this.alpha) * 0.02;
@@ -267,8 +269,23 @@
 
     var ctx = canvas.getContext('2d');
     var particles = [];
-    var mouse = { x: 0, y: 0, active: false };
+    // 鼠标状态：
+    //  - x/y: 光标当前位置
+    //  - active: 光标是否在页面内
+    //  - moved: 本帧内光标是否移动过
+    //  - lastMoveTime: 最后一次移动的时间戳
+    //  - stillTime: 光标已静止的时长（秒）
+    //  - vortexX/vortexY: 涡旋锁定中心（静止位置）
+    //  - vortexIntensity: 涡旋强度（0~1，平滑渐入渐出）
+    var mouse = { x: 0, y: 0, active: false, moved: false, lastMoveTime: 0, stillTime: 0, vortexX: 0, vortexY: 0, vortexIntensity: 0 };
     var lastTime = performance.now();
+    // 涡旋参数：静止多久后触发（秒）、渐入/渐出速度、涡旋半径、锁定开关
+    var VORTEX = {
+      stillDelay: 1.0,        // 光标静止 1 秒后才触发涡旋
+      fadeInSpeed: 1.2,       // 渐入速度（强度/秒）
+      fadeOutSpeed: 2.5,      // 渐出速度（强度/秒，移动时快速消散）
+      lockCenter: true        // 涡旋锁定在静止位置，不随光标移动
+    };
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -287,9 +304,16 @@
     resizeCanvas();
 
     window.addEventListener('mousemove', function (event) {
+      var wasInactive = !mouse.active;
       mouse.x = event.clientX;
       mouse.y = event.clientY;
       mouse.active = true;
+      // 首次进入页面或移动时标记 moved（不立即激活涡旋——需静止 1 秒）
+      // 曾在页面内时才需要标记 moved；首次进入时也视为移动，重置静止计时
+      mouse.moved = true;
+      if (wasInactive) {
+        mouse.stillTime = 0;
+      }
     });
 
     // mouseleave 不冒泡：仅在指针真正离开文档时才关闭涡旋，
@@ -298,6 +322,7 @@
       // relatedTarget 为 null 时表示离开文档/窗口
       if (!event.relatedTarget) {
         mouse.active = false;
+        mouse.vortexIntensity = 0;
       }
     });
 
@@ -307,6 +332,17 @@
         mouse.x = event.touches[0].clientX;
         mouse.y = event.touches[0].clientY;
         mouse.active = true;
+        mouse.moved = true; // 触摸移动标记，不立即激活涡旋
+      }
+    });
+
+    // 触摸开始时激活（保持与鼠标静止逻辑一致：静止 1 秒后触发）
+    window.addEventListener('touchstart', function (event) {
+      if (event.touches.length > 0) {
+        mouse.x = event.touches[0].clientX;
+        mouse.y = event.touches[0].clientY;
+        mouse.active = true;
+        mouse.moved = true;
       }
     });
 
@@ -328,6 +364,39 @@
       lastTime = now;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 涡旋状态机：光标停止移动后，在其静止位置渐入涡旋；
+      // 一旦光标重新移动，涡旋立即渐出（移动中始终保持渐出，
+      // 杜绝"边移动边转"的疯转效果）。
+      if (mouse.active) {
+        if (mouse.moved) {
+          // 光标移动中：重置计时，涡旋渐出
+          mouse.stillTime = 0;
+          mouse.lastMoveTime = now;
+          mouse.vortexIntensity = Math.max(0, mouse.vortexIntensity - VORTEX.fadeOutSpeed * dt);
+          mouse.moved = false;
+        } else {
+          // 光标静止：累计静止时间
+          mouse.stillTime += dt;
+          // 渐出进行中时不做渐入（移动后的冷却）；静止达到阈值后渐入
+          var sinceMove = (now - mouse.lastMoveTime) / 1000;
+          if (sinceMove >= VORTEX.stillDelay && mouse.vortexIntensity < 1) {
+            // 达到静止阈值：首次锁定涡旋中心为当前光标位置
+            if (mouse.vortexIntensity <= 0.01) {
+              mouse.vortexX = mouse.x;
+              mouse.vortexY = mouse.y;
+            }
+            // 渐入涡旋
+            mouse.vortexIntensity = Math.min(1, mouse.vortexIntensity + VORTEX.fadeInSpeed * dt);
+          } else {
+            // 还没到静止阈值：继续渐出（移动冷却期）
+            mouse.vortexIntensity = Math.max(0, mouse.vortexIntensity - VORTEX.fadeOutSpeed * dt);
+          }
+        }
+      } else {
+        // 光标离开页面：涡旋渐出
+        mouse.vortexIntensity = Math.max(0, mouse.vortexIntensity - VORTEX.fadeOutSpeed * dt);
+      }
 
       if (!CONFIG.reducedMotion) {
         for (var i = 0; i < particles.length; i++) {
