@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UW ATG Rooftop Live</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a90e2 100%);
+      color: white;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .language-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .language-btn {
+      background: none;
+      border: none;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .language-btn.active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .header {
+      text-align: center;
+      padding: 60px 0 30px;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .header h1 {
+      font-size: 2.6rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      background: linear-gradient(to right, #ffffff, #a8edea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.8;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0 30px;
+    }
+
+    .nav a {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      font-size: 12px;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 9px 14px;
+      border-radius: 9px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .btn.ghost {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .status {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .kpi {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .kpi .label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 6px;
+    }
+
+    .kpi .value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .chart-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .chart-card h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+
+    .chart-card canvas {
+      width: 100% !important;
+      height: 260px !important;
+    }
+
+    .note {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 40px 0 60px;
+      margin-top: 40px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    .chart-card.zoomable {
+      cursor: zoom-in;
+    }
+
+    .chart-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(8, 12, 24, 0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .chart-modal.active {
+      display: flex;
+    }
+
+    .chart-modal-content {
+      width: min(1200px, 94vw);
+      max-height: 90vh;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 18px;
+      position: relative;
+    }
+
+    .chart-modal-content h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+
+    .chart-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-radius: 999px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .chart-modal canvas {
+      width: 100% !important;
+      height: 62vh !important;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (min-width: 980px) {
+      .grid {
+        grid-template-columns: 3fr 1fr;
+      }
+      .chart-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="language-toggle">
+    <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
+    <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1 class="text" data-zh="UW ATG 屋顶观测" data-en="UW ATG Rooftop Live">UW ATG Rooftop Live</h1>
+      <p class="text" data-zh="自动拉取并展示最新观测数据" data-en="Automatically fetch and display the latest observations">Automatically fetch and display the latest observations</p>
+    </div>
+
+    <div class="nav">
+      <a href="视频_new.html" class="text" data-zh="科普视频" data-en="Videos">科普视频</a>
+      <a href="article.html" class="text" data-zh="科普文章" data-en="Articles">科普文章</a>
+      <a href="app.html" class="text" data-zh="应用" data-en="Apps">应用</a>
+      <a href="气象网站.html" class="text" data-zh="气象网站" data-en="Websites">气象网站</a>
+      <a href="Home.html" class="text" data-zh="主页" data-en="Home">主页</a>
+    </div>
+
+    <section class="glass-card">
+      <div class="controls">
+        <div>
+          <label class="text" data-zh="数据地址（最新）" data-en="Latest data URL">Latest data URL</label>
+          <input id="dataUrl" type="text" value="https://a.atmos.washington.edu/cgi-bin/latest_uw.cgi" />
+        </div>
+        <div>
+          <label class="text" data-zh="代理前缀（可选）" data-en="Proxy prefix (optional)">Proxy prefix (optional)</label>
+          <input id="proxy" type="text" value="https://r.jina.ai/http://" />
+        </div>
+        <div>
+          <label class="text" data-zh="更新间隔（秒）" data-en="Refresh interval (sec)">Refresh interval (sec)</label>
+          <input id="interval" type="number" min="30" max="600" value="90" />
+        </div>
+        <div class="row">
+          <button class="btn" id="startBtn"><span class="text" data-zh="开始" data-en="Start">Start</span></button>
+          <button class="btn secondary" id="stopBtn"><span class="text" data-zh="停止" data-en="Stop">Stop</span></button>
+          <button class="btn ghost" id="tzBtn">Time: UTC</button>
+          <button class="btn ghost" id="windUnitBtn">Wind: m/s</button>
+          <button class="btn ghost" id="unitBtn">Units: Metric</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <label style="margin:0;">
+          <input type="checkbox" id="useProxy" checked />
+          <span class="text" data-zh="使用代理解决 CORS" data-en="Use proxy to bypass CORS">Use proxy to bypass CORS</span>
+        </label>
+        <span class="status" id="status">Idle</span>
+      </div>
+    </section>
+
+    <section class="glass-card kpis" id="kpis"></section>
+    <section class="glass-card kpis" id="summary"></section>
+
+    <section class="glass-card grid">
+      <div class="chart-grid">
+        <div class="chart-card zoomable"><h3 class="text" data-zh="温度" data-en="Temperature">Temperature</h3><canvas id="chartTemp"></canvas></div>
+        <div class="chart-card zoomable"><h3 class="text" data-zh="相对湿度" data-en="Relative Humidity">Relative Humidity</h3><canvas id="chartRh"></canvas></div>
+        <div class="chart-card zoomable"><h3 class="text" data-zh="风速 / 阵风" data-en="Wind / Gust">Wind / Gust</h3><canvas id="chartWind"></canvas></div>
+        <div class="chart-card zoomable"><h3 class="text" data-zh="风向" data-en="Wind Direction">Wind Direction</h3><canvas id="chartDir"></canvas></div>
+        <div class="chart-card zoomable"><h3 class="text" data-zh="气压" data-en="Pressure">Pressure</h3><canvas id="chartPres"></canvas></div>
+        <div class="chart-card zoomable"><h3 class="text" data-zh="降水累计" data-en="Cumulative Rain">Cumulative Rain</h3><canvas id="chartRain"></canvas></div>
+        <div class="chart-card zoomable"><h3 class="text" data-zh="太阳辐照" data-en="Solar Radiation">Solar Radiation</h3><canvas id="chartSolar"></canvas></div>
+        <div class="chart-card"><h3 class="text" data-zh="风向风玫瑰" data-en="Wind Rose">Wind Rose</h3><canvas id="chartWindRose"></canvas></div>
+      </div>
+      <div>
+        <div class="note" id="note"></div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <p>&copy; 2026 <span class="text" data-zh="罗一丁｜华盛顿大学大气科学专业学生." data-en="Yiding (Leo) Luo｜Atmospheric Sciences Student at University of Washington.">Yiding (Leo) Luo｜Atmospheric Sciences Student at University of Washington.</span></p>
+    </div>
+  </div>
+
+  <div class="chart-modal" id="chartModal">
+    <div class="chart-modal-content">
+      <button class="chart-modal-close" id="chartModalClose" aria-label="Close">×</button>
+      <h3 id="chartModalTitle">Chart</h3>
+      <canvas id="chartModalCanvas"></canvas>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    const statusEl = document.getElementById("status");
+    const kpiEl = document.getElementById("kpis");
+    const summaryEl = document.getElementById("summary");
+    const noteEl = document.getElementById("note");
+    const tzBtn = document.getElementById("tzBtn");
+    const windUnitBtn = document.getElementById("windUnitBtn");
+    const unitBtn = document.getElementById("unitBtn");
+    const chartModal = document.getElementById("chartModal");
+    const chartModalTitle = document.getElementById("chartModalTitle");
+    const chartModalCanvas = document.getElementById("chartModalCanvas");
+    const chartModalClose = document.getElementById("chartModalClose");
+
+    let timer = null;
+    const charts = {};
+    let modalChart = null;
+    const state = {
+      series: [],
+      maxPoints: 1440,
+      useLocalTime: false,
+      windUnit: "m/s",
+      unitSystem: "metric" // metric | imperial
+    };
+
+    const i18n = {
+      zh: {
+        statusIdle: "待启动",
+        statusFetching: "拉取中...",
+        statusStopped: "已停止",
+        statusNoData: "无数据",
+        statusUpdated: "更新: {stamp} | 覆盖 {span}h",
+        statusError: "失败: {msg}",
+        parseDateFail: "无法解析日期",
+        parseFail: "解析失败",
+        timeUtc: "时间: UTC",
+        timeLocal: "时间: 本地",
+        windUnit: "风速: {unit}",
+        unitSystem: "单位: {unit}",
+        note: "说明: 数据源为 UW ATG 屋顶观测站。页面自动拉取最新与前一日数据。风向以风玫瑰图展示（按风速加权）。如遇 CORS，请保持代理勾选。",
+        kpiTime: "时间",
+        kpiWindDir: "当前风向",
+        kpiTemp: "温度 {unit}",
+        kpiRh: "相对湿度 %",
+        kpiWind: "风速 {unit}",
+        kpiGust: "阵风 {unit}",
+        kpiPres: "气压 {unit}",
+        kpiRain: "降水 {unit}",
+        kpiSolar: "太阳辐射 W/m²",
+        sumMaxTemp: "{span}h最高温 {unit}",
+        sumMinTemp: "{span}h最低温 {unit}",
+        sumMaxWind: "{span}h最大风速 {unit}",
+        sumMaxGust: "{span}h最大阵风 {unit}",
+        sumMaxPres: "{span}h最高气压 {unit}",
+        sumMinPres: "{span}h最低气压 {unit}",
+        sumAvgRh: "{span}h平均湿度 %",
+        sumRain: "{span}h累计降水 {unit}",
+        chartTemp: "温度",
+        chartRh: "相对湿度 %",
+        chartWind: "风速",
+        chartDir: "风向",
+        chartGust: "阵风",
+        chartPres: "气压",
+        chartRain: "降水累计",
+        chartSolar: "太阳辐照",
+        windRoseLabel: "风速加权"
+      },
+      en: {
+        statusIdle: "Idle",
+        statusFetching: "Fetching...",
+        statusStopped: "Stopped",
+        statusNoData: "No data",
+        statusUpdated: "Updated: {stamp} | Span {span}h",
+        statusError: "Error: {msg}",
+        parseDateFail: "Unable to parse date",
+        parseFail: "Parse failed",
+        timeUtc: "Time: UTC",
+        timeLocal: "Time: Local",
+        windUnit: "Wind: {unit}",
+        unitSystem: "Units: {unit}",
+        note: "Note: Data source is the UW ATG rooftop station. The page pulls the latest and previous day data automatically. Wind direction is shown as a wind rose (speed-weighted). If CORS occurs, keep proxy enabled.",
+        kpiTime: "Time",
+        kpiWindDir: "Wind Dir",
+        kpiTemp: "Temp {unit}",
+        kpiRh: "RH %",
+        kpiWind: "Wind {unit}",
+        kpiGust: "Gust {unit}",
+        kpiPres: "Pressure {unit}",
+        kpiRain: "Rain {unit}",
+        kpiSolar: "Solar W/m²",
+        sumMaxTemp: "{span}h Max Temp {unit}",
+        sumMinTemp: "{span}h Min Temp {unit}",
+        sumMaxWind: "{span}h Max Wind {unit}",
+        sumMaxGust: "{span}h Max Gust {unit}",
+        sumMaxPres: "{span}h Max Pressure {unit}",
+        sumMinPres: "{span}h Min Pressure {unit}",
+        sumAvgRh: "{span}h Avg RH %",
+        sumRain: "{span}h Rain Total {unit}",
+        chartTemp: "Temp",
+        chartRh: "RH %",
+        chartWind: "Wind",
+        chartDir: "Wind Direction",
+        chartGust: "Gust",
+        chartPres: "Pressure",
+        chartRain: "Cumulative Rain",
+        chartSolar: "Solar Radiation",
+        windRoseLabel: "Speed-weighted"
+      }
+    };
+
+    let currentLang = "en";
+
+    function t(key, vars) {
+      const dict = i18n[currentLang] || i18n.en;
+      let str = dict[key] || key;
+      if (vars) {
+        Object.keys(vars).forEach(k => {
+          str = str.replace(`{${k}}`, vars[k]);
+        });
+      }
+      return str;
+    }
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
+
+    function round2(v) {
+      if (v == null) return null;
+      return Math.round(v * 100) / 100;
+    }
+
+    function fmt2(v) {
+      return v == null ? "—" : round2(v).toFixed(2);
+    }
+
+    function buildFetchUrl(url) {
+      const proxy = document.getElementById("proxy").value.trim();
+      const useProxy = document.getElementById("useProxy").checked;
+      const bust = url + (url.includes("?") ? "&" : "?") + "_t=" + Date.now();
+      if (!useProxy || !proxy) return bust;
+      const clean = bust.replace(/^https?:\/\//, "");
+      return proxy + clean;
+    }
+
+    function monthToIndex(name) {
+      const m = {
+        january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+        july: 6, august: 7, september: 8, october: 9, november: 10, december: 11
+      };
+      return m[name.toLowerCase()];
+    }
+
+    function parseHeaderDate(text) {
+      const re = /ATG rooftop data for\s+(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i;
+      const m = text.match(re);
+      if (!m) return null;
+      const day = Number(m[1]);
+      const month = monthToIndex(m[2]);
+      const year = Number(m[3]);
+      if (!Number.isFinite(day) || month == null || !Number.isFinite(year)) return null;
+      return { day, month, year, label: `${m[1]} ${m[2]} ${m[3]}` };
+    }
+
+    function parseData(text) {
+      const headerDate = parseHeaderDate(text);
+      const lines = text.split(/\r?\n/);
+      const rows = [];
+      for (const line of lines) {
+        const raw = line.trim();
+        if (!/^\d{2}:\d{2}:\d{2}\s+/.test(raw)) continue;
+        const parts = raw.split(/\s+/);
+        if (parts.length < 9) continue;
+        const [timeStr, rh, tempF, dir, spd, gust, rain, solar, pressure] = parts;
+        const tParts = timeStr.split(":").map(Number);
+        if (!headerDate || tParts.length !== 3) continue;
+        const ts = Date.UTC(headerDate.year, headerDate.month, headerDate.day, tParts[0], tParts[1], tParts[2]);
+        const tempFNum = toNum(tempF);
+        const cleanTempF = (tempFNum === 0 ? null : tempFNum);
+        const gustNum = toNum(gust);
+        rows.push({
+          ts,
+          dateStr: headerDate.label,
+          timeStr,
+          rh: toNum(rh),
+          tempF: cleanTempF,
+          tempC: cleanTempF == null ? null : (cleanTempF - 32) * 5 / 9,
+          dir: toNum(dir),
+          spd: toNum(spd),
+          gust: (gustNum === 0 ? null : gustNum),
+          rainInch: toNum(rain),
+          solar: toNum(solar),
+          pressure: toNum(pressure)
+        });
+      }
+      return rows;
+    }
+
+    function toNum(v) {
+      if (v === "" || v === "-" || v === "NA") return null;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function mergeAndFilter(rows) {
+      const map = new Map();
+      for (const r of rows) map.set(r.ts, r);
+      const all = Array.from(map.values()).sort((a, b) => a.ts - b.ts);
+      const maxTs = all.length ? all[all.length - 1].ts : Date.now();
+      const minTs = maxTs - 24 * 60 * 60 * 1000;
+      return all.filter(r => r.ts >= minTs && r.ts <= maxTs);
+    }
+
+    function degToCompass(deg) {
+      if (deg == null) return "—";
+      const dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+      const idx = Math.round(((deg % 360) / 22.5)) % 16;
+      return dirs[idx];
+    }
+
+    function formatTime(ts) {
+      const d = new Date(ts);
+      if (state.useLocalTime) {
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+      const hh = String(d.getUTCHours()).padStart(2, "0");
+      const mm = String(d.getUTCMinutes()).padStart(2, "0");
+      return `${hh}:${mm}`;
+    }
+
+    function formatStamp(obs) {
+      if (!obs) return "";
+      const d = new Date(obs.ts);
+      if (state.useLocalTime) {
+        return d.toLocaleString();
+      }
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      const hh = String(d.getUTCHours()).padStart(2, "0");
+      const mm = String(d.getUTCMinutes()).padStart(2, "0");
+      const ss = String(d.getUTCSeconds()).padStart(2, "0");
+      return `${y}-${m}-${day} ${hh}:${mm}:${ss} UTC`;
+    }
+
+    function windTo(unit, vKnots) {
+      if (vKnots == null) return null;
+      if (unit === "m/s") return vKnots * 0.514444;
+      if (unit === "km/h") return vKnots * 1.852;
+      if (unit === "kt") return vKnots;
+      if (unit === "mph") return vKnots * 1.15078;
+      return vKnots;
+    }
+
+    function tempUnitLabel() {
+      return state.unitSystem === "imperial" ? "°F" : "°C";
+    }
+
+    function presUnitLabel() {
+      return state.unitSystem === "imperial" ? "mb" : "hPa";
+    }
+
+    function rainUnitLabel() {
+      return state.unitSystem === "imperial" ? "in" : "mm";
+    }
+
+    function tempValue(obs) {
+      return state.unitSystem === "imperial" ? obs.tempF : obs.tempC;
+    }
+
+    function presValue(obs) {
+      if (obs.pressure == null) return null;
+      return obs.pressure;
+    }
+
+    function rainValue(obs) {
+      if (obs.rainInch == null) return null;
+      return state.unitSystem === "imperial" ? obs.rainInch : obs.rainInch * 25.4;
+    }
+
+    function renderKpis(obs) {
+      if (!obs) return;
+      const windSpd = windTo(state.windUnit, obs.spd);
+      const windGust = windTo(state.windUnit, obs.gust);
+      const items = [
+        [t("kpiTime"), formatStamp(obs)],
+        [t("kpiWindDir"), `${degToCompass(obs.dir)} (${fmt2(obs.dir)}°)`],
+        [t("kpiTemp", { unit: tempUnitLabel() }), fmt2(tempValue(obs))],
+        [t("kpiRh"), fmt2(obs.rh)],
+        [t("kpiWind", { unit: state.windUnit }), fmt2(windSpd)],
+        [t("kpiGust", { unit: state.windUnit }), fmt2(windGust)],
+        [t("kpiPres", { unit: presUnitLabel() }), fmt2(presValue(obs))],
+        [t("kpiRain", { unit: rainUnitLabel() }), fmt2(rainValue(obs))],
+        [t("kpiSolar"), fmt2(obs.solar)]
+      ];
+      kpiEl.innerHTML = items.map(([label, value]) => (
+        `<div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>`
+      )).join("");
+    }
+
+    function renderSummary(series) {
+      if (!series.length) return;
+      const temps = series.map(d => tempValue(d)).filter(v => v != null);
+      const winds = series.map(d => d.spd).filter(v => v != null);
+      const gusts = series.map(d => d.gust).filter(v => v != null);
+      const press = series.map(d => presValue(d)).filter(v => v != null);
+      const rh = series.map(d => d.rh).filter(v => v != null);
+
+      const maxTemp = temps.length ? Math.max(...temps) : null;
+      const minTemp = temps.length ? Math.min(...temps) : null;
+      const maxWind = winds.length ? Math.max(...winds) : null;
+      const maxGust = gusts.length ? Math.max(...gusts) : null;
+      const maxPres = press.length ? Math.max(...press) : null;
+      const minPres = press.length ? Math.min(...press) : null;
+      const avgRh = rh.length ? rh.reduce((a,b)=>a+b,0)/rh.length : null;
+      const totalRain = cumulativeRain(series).slice(-1)[0];
+
+      const spanHours = series.length
+        ? Math.max(0.1, ((series[series.length - 1].ts - series[0].ts) / 3600000)).toFixed(1)
+        : "0.0";
+      const items = [
+        [t("sumMaxTemp", { unit: tempUnitLabel(), span: spanHours }), fmt2(maxTemp)],
+        [t("sumMinTemp", { unit: tempUnitLabel(), span: spanHours }), fmt2(minTemp)],
+        [t("sumMaxWind", { unit: state.windUnit, span: spanHours }), fmt2(windTo(state.windUnit, maxWind))],
+        [t("sumMaxGust", { unit: state.windUnit, span: spanHours }), fmt2(windTo(state.windUnit, maxGust))],
+        [t("sumMaxPres", { unit: presUnitLabel(), span: spanHours }), fmt2(maxPres)],
+        [t("sumMinPres", { unit: presUnitLabel(), span: spanHours }), fmt2(minPres)],
+        [t("sumAvgRh", { span: spanHours }), fmt2(avgRh)],
+        [t("sumRain", { unit: rainUnitLabel(), span: spanHours }), fmt2(totalRain)]
+      ];
+      summaryEl.innerHTML = items.map(([label, value]) => (
+        `<div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>`
+      )).join("");
+    }
+
+    function ensureLineChart(id, label, color, datasets=1, colors=null) {
+      if (charts[id]) return charts[id];
+      const ctx = document.getElementById(id);
+      const ds = [];
+      for (let i=0;i<datasets;i++) {
+        const c = colors && colors[i] ? colors[i] : color;
+        ds.push({ label, data: [], borderColor: c, backgroundColor: c + "33", tension: 0.35, borderDash: i===1 ? [6,4] : [] });
+      }
+      charts[id] = new Chart(ctx, {
+        type: "line",
+        data: { labels: [], datasets: ds },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          scales: {
+            x: { grid: { color: "rgba(255,255,255,0.1)" }, ticks: { color: "#ffffff" } },
+            y: { grid: { color: "rgba(255,255,255,0.1)" }, ticks: { color: "#ffffff" } }
+          },
+          plugins: { legend: { display: true, labels: { color: "#fff" } } }
+        }
+      });
+      return charts[id];
+    }
+
+    function ensureWindRose() {
+      if (charts.windRose) return charts.windRose;
+      const ctx = document.getElementById("chartWindRose");
+      charts.windRose = new Chart(ctx, {
+        type: "radar",
+        data: { labels: [], datasets: [{ label: t("windRoseLabel"), data: [], borderColor: "#a8edea", backgroundColor: "rgba(168,237,234,0.25)" }] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: "rgba(255,255,255,0.15)" },
+              grid: { color: "rgba(255,255,255,0.15)" },
+              ticks: { display: false, color: "#ffffff" },
+              pointLabels: { color: "#ffffff" }
+            }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+      return charts.windRose;
+    }
+
+    function cumulativeRain(series) {
+      let total = 0;
+      const out = [];
+      for (const d of series) {
+        if (d.rainInch != null) {
+          total += (state.unitSystem === "imperial") ? d.rainInch : d.rainInch * 25.4;
+        }
+        out.push(round2(total));
+      }
+      return out;
+    }
+
+    function updateCharts(series) {
+      const labels = series.map(d => formatTime(d.ts));
+
+      const cTemp = ensureLineChart("chartTemp", t("chartTemp"), "#a8edea");
+      cTemp.data.labels = labels;
+      cTemp.data.datasets[0].label = `${t("chartTemp")} ${tempUnitLabel()}`;
+      cTemp.data.datasets[0].data = series.map(d => round2(tempValue(d)));
+      cTemp.update("none");
+
+      const cRh = ensureLineChart("chartRh", t("chartRh"), "#9ad0ff");
+      cRh.data.labels = labels;
+      cRh.data.datasets[0].label = t("chartRh");
+      cRh.data.datasets[0].data = series.map(d => round2(d.rh));
+      cRh.update("none");
+
+      const cWind = ensureLineChart("chartWind", t("chartWind"), "#8fe3cf", 2, ["#8fe3cf", "#ffc6a6"]);
+      cWind.data.labels = labels;
+      cWind.data.datasets[0].label = `${t("chartWind")} ${state.windUnit}`;
+      cWind.data.datasets[1].label = `${t("chartGust")} ${state.windUnit}`;
+      cWind.data.datasets[0].data = series.map(d => round2(windTo(state.windUnit, d.spd)));
+      cWind.data.datasets[1].data = series.map(d => round2(windTo(state.windUnit, d.gust)));
+      cWind.update("none");
+
+      const cDir = ensureLineChart("chartDir", t("chartDir"), "#ffd27f");
+      cDir.data.labels = labels;
+      cDir.data.datasets[0].label = `${t("chartDir")} °`;
+      cDir.data.datasets[0].data = series.map(d => (d.dir == null ? null : round2(d.dir)));
+      if (cDir.options && cDir.options.scales && cDir.options.scales.y) {
+        cDir.options.scales.y.min = 0;
+        cDir.options.scales.y.max = 360;
+        cDir.options.scales.y.ticks = {
+          stepSize: 45,
+          color: "#ffffff",
+          callback: (value) => (value % 45 === 0 ? value : "")
+        };
+      }
+      cDir.update("none");
+
+      const cPres = ensureLineChart("chartPres", t("chartPres"), "#ffffff");
+      cPres.data.labels = labels;
+      cPres.data.datasets[0].label = `${t("chartPres")} ${presUnitLabel()}`;
+      cPres.data.datasets[0].data = series.map(d => round2(presValue(d)));
+      cPres.update("none");
+
+      const cRain = ensureLineChart("chartRain", t("chartRain"), "#cfd9ff");
+      cRain.data.labels = labels;
+      cRain.data.datasets[0].label = `${t("chartRain")} ${rainUnitLabel()}`;
+      cRain.data.datasets[0].data = cumulativeRain(series);
+      cRain.update("none");
+
+      const cSolar = ensureLineChart("chartSolar", t("chartSolar"), "#ffe18a");
+      cSolar.data.labels = labels;
+      cSolar.data.datasets[0].label = `${t("chartSolar")} W/m²`;
+      const solarRaw = series.map(d => (d.solar == null ? null : d.solar));
+      const solarFiltered = solarRaw.map((v, i, arr) => {
+        if (v == null) return null;
+        if (v !== 0) return round2(v);
+
+        // 若 0 处在“被正值夹着”的零段中，则移除整段 0
+        let left = i - 1;
+        while (left >= 0 && arr[left] === 0) left--;
+        let right = i + 1;
+        while (right < arr.length && arr[right] === 0) right++;
+        const leftVal = left >= 0 ? arr[left] : null;
+        const rightVal = right < arr.length ? arr[right] : null;
+        const leftPositive = leftVal != null && leftVal > 0;
+        const rightPositive = rightVal != null && rightVal > 0;
+        const threshold = 0.1;
+        // 若夹住的正值都“显著大于夜晚阈值”，则移除零段；否则保留夜晚 0
+        if (leftPositive && rightPositive && leftVal > threshold && rightVal > threshold) return null;
+        return 0;
+      });
+      cSolar.data.datasets[0].data = solarFiltered;
+      cSolar.update("none");
+
+      const rose = ensureWindRose();
+      const labels16 = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+      const bins = new Array(16).fill(0);
+      for (const d of series) {
+        if (d.dir == null || d.spd == null) continue;
+        const idx = Math.round(((d.dir % 360) / 22.5)) % 16;
+        bins[idx] += d.spd;
+      }
+      rose.data.labels = labels16;
+      rose.data.datasets[0].label = t("windRoseLabel");
+      rose.data.datasets[0].data = bins.map(round2);
+      rose.update("none");
+    }
+
+    function openChartModal(chartId, titleText) {
+      const src = charts[chartId];
+      if (!src) return;
+
+      chartModalTitle.textContent = titleText || "Chart";
+      chartModal.classList.add("active");
+
+      if (modalChart) {
+        modalChart.destroy();
+        modalChart = null;
+      }
+
+      const config = {
+        type: src.config.type,
+        data: JSON.parse(JSON.stringify(src.data)),
+        options: JSON.parse(JSON.stringify(src.options))
+      };
+
+      if (config.options && config.options.plugins && config.options.plugins.legend) {
+        config.options.plugins.legend.labels.color = "#fff";
+      }
+      if (config.options && config.options.scales) {
+        Object.values(config.options.scales).forEach(scale => {
+          if (scale.ticks) scale.ticks.color = "#ffffff";
+          if (scale.grid) scale.grid.color = "rgba(255,255,255,0.1)";
+          if (scale.pointLabels) scale.pointLabels.color = "#ffffff";
+        });
+      }
+
+      if (chartId === "chartDir" && config.options && config.options.scales && config.options.scales.y) {
+        const degLabels = {
+          0: "N",
+          45: "NE",
+          90: "E",
+          135: "SE",
+          180: "S",
+          225: "SW",
+          270: "W",
+          315: "NW",
+          360: "N"
+        };
+        config.options.scales.y.ticks = {
+          stepSize: 45,
+          color: "#ffffff",
+          callback: (value) => {
+            if (value % 45 !== 0) return "";
+            const label = degLabels[value] || "";
+            return label ? `${value} (${label})` : `${value}`;
+          }
+        };
+      }
+
+      modalChart = new Chart(chartModalCanvas, config);
+    }
+
+    function closeChartModal() {
+      chartModal.classList.remove("active");
+      if (modalChart) {
+        modalChart.destroy();
+        modalChart = null;
+      }
+    }
+
+    async function fetchText(url) {
+      const res = await fetch(buildFetchUrl(url), { cache: "no-store" });
+      return res.text();
+    }
+
+    async function pullOnce() {
+      setStatus(t("statusFetching"));
+      try {
+        const latestUrl = document.getElementById("dataUrl").value.trim();
+        const latestText = await fetchText(latestUrl);
+        const header = parseHeaderDate(latestText);
+        if (!header) throw new Error(t("parseDateFail"));
+
+        const date = new Date(Date.UTC(header.year, header.month, header.day));
+        const prev = new Date(date.getTime() - 24 * 60 * 60 * 1000);
+        const y = prev.getUTCFullYear();
+        const m = String(prev.getUTCMonth() + 1).padStart(2, "0");
+        const d = String(prev.getUTCDate()).padStart(2, "0");
+        const prevUrl = `https://a.atmos.washington.edu/cgi-bin/uw.cgi?${y}${m}${d}`;
+
+        const [latestRows, prevText] = await Promise.all([
+          Promise.resolve(parseData(latestText)),
+          fetchText(prevUrl)
+        ]);
+        if (!latestRows.length) throw new Error(t("parseFail"));
+        const prevRows = parseData(prevText);
+
+        let series = mergeAndFilter([...latestRows, ...prevRows]);
+
+        state.series = series;
+        const latest = series[series.length - 1];
+        renderKpis(latest);
+        renderSummary(series);
+        updateCharts(series);
+        const stamp = latest ? formatStamp(latest) : "";
+        const spanH = series.length ? ((series[series.length - 1].ts - series[0].ts) / 3600000).toFixed(1) : "0.0";
+        setStatus(latest ? t("statusUpdated", { stamp, span: spanH }) : t("statusNoData"));
+      } catch (err) {
+        setStatus(t("statusError", { msg: err.message }));
+      }
+    }
+
+    function start() {
+      const seconds = Number(document.getElementById("interval").value) || 90;
+      if (timer) clearInterval(timer);
+      pullOnce();
+      timer = setInterval(pullOnce, Math.max(30, seconds) * 1000);
+    }
+
+    function stop() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      setStatus(t("statusStopped"));
+    }
+
+    function toggleTz() {
+      state.useLocalTime = !state.useLocalTime;
+      tzBtn.textContent = state.useLocalTime ? t("timeLocal") : t("timeUtc");
+      if (state.series.length) {
+        renderKpis(state.series[state.series.length - 1]);
+        renderSummary(state.series);
+        updateCharts(state.series);
+      }
+    }
+
+    function toggleWindUnit() {
+      const order = ["m/s", "km/h", "kt", "mph"];
+      const idx = (order.indexOf(state.windUnit) + 1) % order.length;
+      state.windUnit = order[idx];
+      windUnitBtn.textContent = t("windUnit", { unit: state.windUnit });
+      if (state.series.length) {
+        renderKpis(state.series[state.series.length - 1]);
+        renderSummary(state.series);
+        updateCharts(state.series);
+      }
+    }
+
+    function toggleUnitSystem() {
+      state.unitSystem = state.unitSystem === "metric" ? "imperial" : "metric";
+      state.windUnit = state.unitSystem === "imperial" ? "mph" : "m/s";
+      windUnitBtn.textContent = t("windUnit", { unit: state.windUnit });
+      unitBtn.textContent = t("unitSystem", { unit: state.unitSystem === "imperial" ? "Imperial" : "Metric" });
+      if (state.series.length) {
+        renderKpis(state.series[state.series.length - 1]);
+        renderSummary(state.series);
+        updateCharts(state.series);
+      }
+    }
+
+    function switchLanguage(lang, btn) {
+      currentLang = lang;
+
+      document.querySelectorAll('.language-btn').forEach(button => {
+        button.classList.remove('active');
+      });
+
+      if (btn) {
+        btn.classList.add('active');
+      } else {
+        const targetBtn = document.querySelector(`.language-btn[data-lang="${lang}"]`);
+        if (targetBtn) targetBtn.classList.add('active');
+      }
+
+      document.querySelectorAll('.text').forEach(element => {
+        const zhText = element.getAttribute('data-zh');
+        const enText = element.getAttribute('data-en');
+        if (zhText && enText) {
+          element.textContent = lang === 'zh' ? zhText : enText;
+        }
+      });
+
+      tzBtn.textContent = state.useLocalTime ? t("timeLocal") : t("timeUtc");
+      windUnitBtn.textContent = t("windUnit", { unit: state.windUnit });
+      unitBtn.textContent = t("unitSystem", { unit: state.unitSystem === "imperial" ? "Imperial" : "Metric" });
+      noteEl.textContent = t("note");
+
+      if (state.series.length) {
+        renderKpis(state.series[state.series.length - 1]);
+        renderSummary(state.series);
+        updateCharts(state.series);
+      } else {
+        setStatus(t("statusIdle"));
+      }
+    }
+
+    function bindChartZoom() {
+      const chartCards = document.querySelectorAll(".chart-card.zoomable");
+      chartCards.forEach(card => {
+        const canvas = card.querySelector("canvas");
+        const title = card.querySelector("h3");
+        if (!canvas || !title) return;
+        const chartId = canvas.id;
+        card.addEventListener("click", () => {
+          openChartModal(chartId, title.textContent);
+        });
+      });
+    }
+
+    document.getElementById("startBtn").addEventListener("click", start);
+    document.getElementById("stopBtn").addEventListener("click", stop);
+    tzBtn.addEventListener("click", toggleTz);
+    windUnitBtn.addEventListener("click", toggleWindUnit);
+    unitBtn.addEventListener("click", toggleUnitSystem);
+    chartModalClose.addEventListener("click", closeChartModal);
+    chartModal.addEventListener("click", (event) => {
+      if (event.target === chartModal) closeChartModal();
+    });
+
+    switchLanguage("en");
+    bindChartZoom();
+    start();
+
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 1.5 + 0.5;
+        this.baseSpeedX = (Math.sin(this.x * 0.005) * 0.3) + (Math.random() - 0.5) * 0.1;
+        this.baseSpeedY = (Math.cos(this.y * 0.005) * 0.3) + (Math.random() - 0.5) * 0.1;
+        this.speedX = this.baseSpeedX;
+        this.speedY = this.baseSpeedY;
+        this.alpha = Math.random() * 0.3 + 0.1;
+        this.history = [];
+        this.maxHistory = 3;
+      }
+
+      update(mouse) {
+        this.history.push({x: this.x, y: this.y});
+        if (this.history.length > this.maxHistory) {
+          this.history.shift();
+        }
+
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const mouseRadius = 100;
+
+        if (distance < mouseRadius && mouse.x !== undefined) {
+          const angle = Math.atan2(dy, dx);
+          const force = (mouseRadius - distance) / mouseRadius;
+          const perturbation = force * 0.8;
+
+          this.speedX += Math.cos(angle) * perturbation * 0.06;
+          this.speedY += Math.sin(angle) * perturbation * 0.06;
+          this.alpha = Math.min(0.4, this.alpha + 0.05);
+        } else {
+          this.speedX += (this.baseSpeedX - this.speedX) * 0.05;
+          this.speedY += (this.baseSpeedY - this.speedY) * 0.05;
+          this.alpha += (Math.random() * 0.3 + 0.1 - this.alpha) * 0.03;
+        }
+
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x > canvas.width) this.x = 0;
+        else if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        else if (this.y < 0) this.y = canvas.height;
+      }
+
+      draw() {
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let i = 0; i < this.history.length; i++) {
+          const pos = this.history[i];
+          const trailAlpha = this.alpha * (i / this.history.length) * 0.2;
+          const trailSize = this.size * (i / this.history.length) * 0.5;
+
+          ctx.fillStyle = `rgba(255, 255, 255, ${trailAlpha})`;
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, trailSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    const particles = [];
+    const particleCount = 100;
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    const mouse = { x: undefined, y: undefined, radius: 100 };
+
+    window.addEventListener('mousemove', (event) => {
+      mouse.x = event.x;
+      mouse.y = event.y;
+    });
+
+    window.addEventListener('mouseout', () => {
+      mouse.x = undefined;
+      mouse.y = undefined;
+    });
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(mouse);
+        particles[i].draw();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

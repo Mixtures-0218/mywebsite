@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yiding Luo Personal Website</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .introduction {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .introduction h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .introduction p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .contact-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+
+            .introduction {
+                padding: 20px;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="windFieldCanvas"></canvas>
+
+    <div class="container">
+        <div class="language-toggle">
+            <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
+            <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+        </div>
+
+        <div class="header">
+            <h1 class="text" data-zh="罗一丁" data-en="Yiding (Leo) Luo">Yiding (Leo) Luo</h1>
+            <p class="text" data-zh="华盛顿大学西雅图分校大气与气候科学专业" data-en="Atmospheric & Climate Science, University of Washington, Seattle">Atmospheric &amp; Climate Science, University of Washington, Seattle</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="intro" onclick="showTab('intro', event)"><span class="text" data-zh="个人介绍" data-en="Introduction">Introduction</span></button>
+            <button class="tab-btn" data-tab="content" onclick="showTab('content', event)"><span class="text" data-zh="内容入口" data-en="Content">Content</span></button>
+        </div>
+
+        <div id="intro-tab" class="tab-content active">
+            <div class="introduction">
+                <h2 class="text" data-zh="个人简介" data-en="Personal Introduction">Personal Introduction</h2>
+                <p class="text" data-zh="我是华盛顿大学西雅图分校2027届本科生，正在攻读大气与气候科学：气象学和大气与气候科学：数据科学双专业，同时辅修应用数学（当前GPA 3.81/4.0）。我的研究兴趣集中在高影响天气、机器学习与中尺度气象学。" 
+                   data-en="I am a University of Washington, Seattle, Class of 2027 undergraduate student pursuing double majors in Atmospheric & Climate Science: Meteorology and Atmospheric & Climate Science: Data Science, with a minor in Applied Mathematics (current GPA 3.81/4.0). My research interests focus on high-impact weather, machine learning, and mesoscale meteorology.">I am a University of Washington, Seattle, Class of 2027 undergraduate student pursuing double majors in Atmospheric &amp; Climate Science: Meteorology and Atmospheric &amp; Climate Science: Data Science, with a minor in Applied Mathematics (current GPA 3.81/4.0). My research interests focus on high-impact weather, machine learning, and mesoscale meteorology.</p>
+                <p class="text" data-zh="目前，我正与Alexandra Anderson-Frey教授合作担任本科生项目负责人（PI），评估Transformer架构机器学习天气模型（盘古天气、风乌、伏羲）在中尺度龙卷风有利对流环境再现上的表现。相关工作的一作论文正在撰写中，计划于2026年10月投稿。" 
+                   data-en="Currently, I am working as the lead undergraduate researcher (PI) with Professor Alexandra Anderson-Frey on evaluating Transformer-based machine learning weather models (Pangu-Weather, FengWu, FuXi) in reproducing mesoscale tornado-favorable convective environments. A first-author manuscript is in preparation, with submission targeted for October 2026.">Currently, I am working as the lead undergraduate researcher (PI) with Professor Alexandra Anderson-Frey on evaluating Transformer-based machine learning weather models (Pangu-Weather, FengWu, FuXi) in reproducing mesoscale tornado-favorable convective environments. A first-author manuscript is in preparation, with submission targeted for October 2026.</p>
+                <p class="text" data-zh="我于2025年暑假在四川省气象局完成软件开发实习，将省级气象局到省级能源局的数据上报流程自动化，单任务处理时间从40分钟缩短至15秒。此外，我很荣幸获得2025-2026与2026-2027学年Sally Schoenberg和Randy Poteet奖学金，以及2026-2027学年Mindlin奖学金。" 
+                   data-en="In summer 2025, I interned as a software developer at the Sichuan Meteorological Bureau, automating the data-reporting pipeline from the provincial meteorological bureau to the provincial energy bureau, reducing a single task's processing time from 40 minutes to 15 seconds. I am also honored to receive the Sally Schoenberg and Randy Poteet Scholarship (2025-2026 & 2026-2027) and the Mindlin Scholarship (2026-2027).">In summer 2025, I interned as a software developer at the Sichuan Meteorological Bureau, automating the data-reporting pipeline from the provincial meteorological bureau to the provincial energy bureau, reducing a single task's processing time from 40 minutes to 15 seconds. I am also honored to receive the Sally Schoenberg and Randy Poteet Scholarship (2025-2026 &amp; 2026-2027) and the Mindlin Scholarship (2026-2027).</p>
+                <p class="text" data-zh="在课外，我积极投身气象科普事业，在B站上运营科普频道，已获得超过2600名关注者和30万以上的播放量。我还加入了学校的DawgCast气象预报社团，与其他气象爱好者一起实践天气预报技能。如果您对我的研究或科普工作感兴趣，欢迎通过邮箱leoluo@uw.edu与我联系。" 
+                   data-en="Outside the classroom, I actively engage in meteorological science communication, running an educational channel on Bilibili with over 2,600 followers and more than 300,000 views. I also joined the school's DawgCast weather forecasting club, practicing forecasting skills with other meteorology enthusiasts. If you are interested in my research or science communication work, please feel free to contact me via leoluo@uw.edu.">Outside the classroom, I actively engage in meteorological science communication, running an educational channel on Bilibili with over 2,600 followers and more than 300,000 views. I also joined the school's DawgCast weather forecasting club, practicing forecasting skills with other meteorology enthusiasts. If you are interested in my research or science communication work, please feel free to contact me via leoluo@uw.edu.</p>
+                <div class="contact-info">
+                    <a href="https://space.bilibili.com/265676913?spm_id_from=333.1007.0.0" target="_blank" class="contact-link">Bilibili</a>
+                    <a href="https://sites.uw.edu/theuwdawgcast/" target="_blank" class="contact-link">DawgCast</a>
+                    <a href="https://atmos.uw.edu/students/undergraduate-program/meet-our-undergraduate-students/" target="_blank" class="contact-link"><span class="text" data-zh="大气科学系" data-en="Atmos Dept.">Atmos Dept.</span></a>
+                    <a href="https://www.linkedin.com/in/yiding-luo-ba1655356/" target="_blank" class="contact-link">LinkedIn</a>
+                    <a href="https://github.com/Mixtures-0218" target="_blank" class="contact-link">GitHub</a>
+                    <a href="mailto:leoluo@uw.edu" class="contact-link">Email</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-tab" class="tab-content">
+            <div class="content-grid">
+                <div class="card">
+                    <div class="card-icon">🎬</div>
+                    <h3 class="card-title text" data-zh="气象科普视频" data-en="Meteorological Videos">Meteorological Videos</h3>
+                    <p class="card-description text" data-zh="深入浅出地讲解气象现象，用生动的动画和实例带你了解天气变化的奥秘" 
+                       data-en="Explaining meteorological phenomena in an accessible way, using vivid animations and examples to take you into the mysteries of weather changes">Explaining meteorological phenomena in an accessible way, using vivid animations and examples to take you into the mysteries of weather changes</p>
+                    <a href="视频_new.html" class="btn"><span class="text" data-zh="观看视频" data-en="Watch Videos">Watch Videos</span></a>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📝</div>
+                    <h3 class="card-title text" data-zh="原创博客文章" data-en="Original Blog Posts">Original Blog Posts</h3>
+                    <p class="card-description text" data-zh="分享最新的气象研究成果、技术心得和行业见解" 
+                       data-en="Sharing the latest meteorological research findings, technical insights, and industry perspectives">Sharing the latest meteorological research findings, technical insights, and industry perspectives</p>
+                    <a href="article.html" class="btn"><span class="text" data-zh="阅读文章" data-en="Read Articles">Read Articles</span></a>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📱</div>
+                    <h3 class="card-title text" data-zh="应用下载中心" data-en="App Download Center">App Download Center</h3>
+                    <p class="card-description text" data-zh="自主研发的安卓气象应用和数据处理工具，免费下载使用" 
+                       data-en="Self-developed meteorological applications and data processing tools, free to download and use">Self-developed meteorological applications and data processing tools, free to download and use</p>
+                    <a href="app.html" class="btn"><span class="text" data-zh="下载应用" data-en="Download Apps">Download Apps</span></a>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📄</div>
+                    <h3 class="card-title text" data-zh="个人简历" data-en="Resume / CV">Resume / CV</h3>
+                    <p class="card-description text" data-zh="查看我的详细简历，包括教育背景、科研经历、实习与获奖情况" 
+                       data-en="View my full resume, including education, research experience, internships, and honors">View my full resume, including education, research experience, internships, and honors</p>
+                    <a href="assets/pdf/Yiding Luo CV.pdf" target="_blank" class="btn"><span class="text" data-zh="查看简历" data-en="View Resume">View Resume</span></a>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2026 <span class="text" data-zh="罗一丁｜华盛顿大学大气科学专业学生." data-en="Yiding (Leo) Luo｜Atmospheric Sciences Student at University of Washington.">Yiding (Leo) Luo｜Atmospheric Sciences Student at University of Washington.</span></p>
+            <p><span class="text" data-zh="网页部分功能由DeepSeek生成" data-en="Some website functions are generated by DeepSeek AI">Some website functions are generated by DeepSeek AI</span></p>
+            <p>备案/许可证编号：<a href="https://beian.miit.gov.cn/" target="_new">蜀ICP备20004581号</a></p>
+        </div>
+    </div>
+
+    <script src="assets/js/wind-field.js"></script>
+    <script src="assets/js/lang.js"></script>
+    <script>
+        // 标签页切换功能（显式接收事件对象，跨浏览器安全）
+        function showTab(tabName, event) {
+            document.querySelectorAll('.tab-content').forEach(function (content) {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(function (btn) {
+                btn.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+            var btn = null;
+            if (event && event.target) {
+                btn = event.target.closest('.tab-btn');
+            } else {
+                // 无事件时按 data-tab 属性查找按钮（用于 URL 锚点自动打开）
+                var buttons = document.querySelectorAll('.tab-btn');
+                for (var i = 0; i < buttons.length; i++) {
+                    if (buttons[i].getAttribute('data-tab') === tabName) {
+                        btn = buttons[i];
+                        break;
+                    }
+                }
+            }
+            if (btn) {
+                btn.classList.add('active');
+            }
+        }
+
+        // 初始化：风场动效 + 语言（默认 English）
+        WindField.init('windFieldCanvas');
+        initLanguage();
+
+        // 支持从子页面 "Back to Content" 链接跳转（Home.html#content）
+        if (window.location.hash === '#content') {
+            showTab('content', null);
+        }
+    </script>
+</body>
+</html>

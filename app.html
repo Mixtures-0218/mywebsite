@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Base Calculator App | Yiding Luo</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .app-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .app-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .app-card h3 {
+            font-size: 1.2rem;
+            font-weight: normal;
+            opacity: 0.85;
+            margin-bottom: 20px;
+        }
+
+        /* 左右布局：左侧缩小截图，右侧信息 */
+        .app-layout {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0 20px;
+        }
+
+        .app-preview {
+            flex: 0 0 auto;
+        }
+
+        .app-preview img {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .app-info {
+            flex: 1;
+            min-width: 0;
+            text-align: left;
+        }
+
+        /* 按钮在右侧面板中相对居中 */
+        .download-area {
+            text-align: center;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin: 10px auto 20px;
+            padding: 12px 28px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transform: scale(1.04);
+        }
+
+        .divider {
+            width: 100%;
+            max-width: 600px;
+            height: 2px;
+            margin: 15px auto 20px;
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .app-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .app-links a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .app-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+            .app-info {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="windFieldCanvas"></canvas>
+
+    <div class="language-toggle">
+        <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
+        <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="text" data-zh="云底高度计算软件" data-en="Cloud Base Calculator">Cloud Base Calculator</h1>
+            <p class="text" data-zh="简单、准确的云底高度估算工具" data-en="A simple and accurate cloud base height calculator">A simple and accurate cloud base height calculator</p>
+        </div>
+
+        <div class="nav">
+            <a href="Home.html#content"><span class="text" data-zh="返回内容" data-en="Back to Content">Back to Content</span></a>
+            <a href="视频_new.html"><span class="text" data-zh="科普视频" data-en="Videos">Videos</span></a>
+            <a href="article.html"><span class="text" data-zh="科普文章" data-en="Articles">Articles</span></a>
+            <a href="Home.html"><span class="text" data-zh="主页" data-en="Home">Home</span></a>
+        </div>
+
+        <div class="app-card">
+            <h2 class="text" data-zh="云底高度计算软件" data-en="Cloud Base Calculator">Cloud Base Calculator</h2>
+            <h3 class="text" data-zh="安卓计算应用" data-en="Android calculator app">Android calculator app</h3>
+
+            <div class="app-layout">
+                <div class="app-preview">
+                    <img src="image/云底高度界面.jpg" alt="Cloud Base Calculator UI" />
+                </div>
+                <div class="app-info">
+                    <div class="download-area">
+                        <a class="download-btn text" href="云底高度.apk" data-zh="立即下载（APK）" data-en="Download APK">Download APK</a>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <p class="app-text text" data-zh="此软件由 MIT App Inventor 自主开发，并未在各大应用商城上架。您下载的是一个纯 APK 文件，不包含任何与该应用无关的内容，可放心下载！"
+                       data-en="This application was developed independently with MIT App Inventor and has not been published to any app store. You are downloading a pure APK file with no unrelated content included, so it is safe to download.">This application was developed independently with MIT App Inventor and has not been published to any app store. You are downloading a pure APK file with no unrelated content included, so it is safe to download.</p>
+
+                    <p class="app-text app-links"><span class="text" data-zh="点击查看相关视频：" data-en="Watch the related video:">Watch the related video:</span> <a href="云底高度.html" target="_blank" class="text" data-zh="云底高度是什么" data-en="What is the height of a cloud base">What is the height of a cloud base</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2026 <span class="text" data-zh="罗一丁｜华盛顿大学大气科学专业学生." data-en="Yiding (Leo) Luo｜Atmospheric Sciences Student at University of Washington.">Yiding (Leo) Luo｜Atmospheric Sciences Student at University of Washington.</span></p>
+            <p><span class="text" data-zh="网页部分功能由DeepSeek生成" data-en="Some website functions are generated by DeepSeek AI">Some website functions are generated by DeepSeek AI</span></p>
+        </div>
+    </div>
+
+    <script src="assets/js/wind-field.js"></script>
+    <script src="assets/js/lang.js"></script>
+    <script>
+        WindField.init('windFieldCanvas');
+        initLanguage();
+    </script>
+</body>
+</html>

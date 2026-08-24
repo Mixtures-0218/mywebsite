@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles | Yiding Luo</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .article-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .article-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .article-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .article-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .article-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .article-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+
+        .article-title {
+            font-size: 1.35rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .article-description {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .article-date {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+
+        .article-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .article-content h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .article-content p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .article-content img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .article-figure {
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.75;
+            margin-bottom: 25px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="windFieldCanvas"></canvas>
+
+    <div class="container">
+        <!-- 语言切换 -->
+        <div class="language-toggle">
+            <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
+            <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+        </div>
+
+        <div class="header">
+            <h1 class="text" data-zh="博客文章" data-en="Blog Articles">Blog Articles</h1>
+            <p class="text" data-zh="探索气象科学与数据科学的前沿知识" data-en="Exploring the frontiers of meteorological and data sciences">Exploring the frontiers of meteorological and data sciences</p>
+        </div>
+
+        <div class="nav">
+            <a href="Home.html#content"><span class="text" data-zh="返回内容" data-en="Back to Content">Back to Content</span></a>
+            <a href="视频_new.html"><span class="text" data-zh="科普视频" data-en="Videos">Videos</span></a>
+            <a href="Home.html"><span class="text" data-zh="主页" data-en="Home">Home</span></a>
+            <a href="app.html"><span class="text" data-zh="应用" data-en="Apps">Apps</span></a>
+        </div>
+
+        <!-- 文章列表 -->
+        <div id="article-list-section" class="content-section active">
+            <div class="article-list" id="article-list"></div>
+        </div>
+
+        <!-- 文章详情 -->
+        <div id="article-content-details" class="content-section">
+            <div class="article-content">
+                <h2 id="selected-article-title"></h2>
+                <div class="article-date" id="article-date"></div>
+                <div id="article-body"></div>
+                <a href="#" class="back-btn" onclick="showArticleList(); return false;">
+                    <span class="text" data-zh="返回文章列表" data-en="Back to List">Back to List</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2026 <span class="text" data-zh="罗一丁｜华盛顿大学大气科学专业学生." data-en="Yiding (Leo) Luo｜Atmospheric Sciences Student at University of Washington.">Yiding (Leo) Luo｜Atmospheric Sciences Student at University of Washington.</span></p>
+            <p><span class="text" data-zh="网页部分功能由DeepSeek生成" data-en="Some website functions are generated by DeepSeek AI">Some website functions are generated by DeepSeek AI</span></p>
+        </div>
+    </div>
+
+    <script src="assets/js/wind-field.js"></script>
+    <script src="assets/js/lang.js"></script>
+    <script src="assets/js/articles-data.js"></script>
+    <script>
+        // 当前语言（由 lang.js 维护，统一读取接口）
+        function currentLang() {
+            if (window.getCurrentLang) {
+                return window.getCurrentLang();
+            }
+            return 'en';
+        }
+
+        // 渲染文章卡片列表
+        function renderArticleList() {
+            var listEl = document.getElementById('article-list');
+            listEl.innerHTML = '';
+            var lang = currentLang();
+
+            for (var i = 0; i < window.ARTICLES_DATA.length; i++) {
+                var article = window.ARTICLES_DATA[i];
+                var card = document.createElement('div');
+                card.className = 'article-card';
+                card.setAttribute('data-id', article.id);
+
+                var icon = document.createElement('div');
+                icon.className = 'article-icon';
+                icon.textContent = article.icon;
+                card.appendChild(icon);
+
+                var title = document.createElement('h3');
+                title.className = 'article-title text';
+                title.setAttribute('data-zh', article.title.zh);
+                title.setAttribute('data-en', article.title.en);
+                title.textContent = lang === 'zh' ? article.title.zh : article.title.en;
+                card.appendChild(title);
+
+                var desc = document.createElement('p');
+                desc.className = 'article-description text';
+                desc.setAttribute('data-zh', article.description.zh);
+                desc.setAttribute('data-en', article.description.en);
+                desc.textContent = lang === 'zh' ? article.description.zh : article.description.en;
+                card.appendChild(desc);
+
+                var date = document.createElement('div');
+                date.className = 'article-date';
+                date.textContent = article.date;
+                card.appendChild(date);
+
+                (function (a) {
+                    card.addEventListener('click', function () {
+                        if (a.type === 'pdf') {
+                            // ENSO 论文：直接新标签页打开 PDF
+                            window.open(a.pdf, '_blank');
+                        } else {
+                            selectArticle(a.id);
+                        }
+                    });
+                })(article);
+
+                listEl.appendChild(card);
+            }
+        }
+
+        // 选择文章（页内展示）
+        function selectArticle(articleId) {
+            var article = null;
+            for (var i = 0; i < window.ARTICLES_DATA.length; i++) {
+                if (window.ARTICLES_DATA[i].id === articleId) {
+                    article = window.ARTICLES_DATA[i];
+                    break;
+                }
+            }
+            if (!article) return;
+
+            // 记录当前文章 id（语言切换时用于重渲染）
+            window.__currentArticleId = articleId;
+
+            var lang = currentLang();
+
+            // 设置标题与日期
+            document.getElementById('selected-article-title').textContent =
+                lang === 'zh' ? article.title.zh : article.title.en;
+            document.getElementById('article-date').textContent = article.date;
+
+            // 设置正文（富文本，静态可信数据）
+            var bodyEl = document.getElementById('article-body');
+            bodyEl.innerHTML = '';
+
+            if (article.type === 'image') {
+                // Seattle 电力信息图：页内大图展示
+                var img = document.createElement('img');
+                img.src = article.image;
+                img.alt = article.title.en;
+                bodyEl.appendChild(img);
+            } else if (article.type === 'text') {
+                var paragraphs = article.body[lang] || article.body.en;
+                for (var j = 0; j < paragraphs.length; j++) {
+                    var p = document.createElement('p');
+                    p.textContent = paragraphs[j];
+                    bodyEl.appendChild(p);
+                }
+                // 图片（多语言说明）
+                var images = article.body.images || [];
+                for (var k = 0; k < images.length; k++) {
+                    var figure = document.createElement('figure');
+                    figure.className = 'article-figure';
+                    var img2 = document.createElement('img');
+                    img2.src = images[k].src;
+                    img2.alt = lang === 'zh' ? images[k].captionZh : images[k].captionEn;
+                    var cap = document.createElement('p');
+                    cap.textContent = lang === 'zh' ? images[k].captionZh : images[k].captionEn;
+                    figure.appendChild(img2);
+                    figure.appendChild(cap);
+                    bodyEl.appendChild(figure);
+                }
+            }
+
+            // 切换视图
+            document.getElementById('article-list-section').classList.remove('active');
+            document.getElementById('article-content-details').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // 返回文章列表
+        function showArticleList() {
+            document.getElementById('article-list-section').classList.add('active');
+            document.getElementById('article-content-details').classList.remove('active');
+            window.scrollTo(0, 0);
+        }
+
+        // 初始化
+        WindField.init('windFieldCanvas');
+        renderArticleList();
+        initLanguage();
+
+        // 语言切换时：重渲染列表；若详情视图打开，则按当前语言重渲染
+        window.registerLanguageChangeHandler(function () {
+            renderArticleList();
+            if (window.__currentArticleId &&
+                document.getElementById('article-content-details').classList.contains('active')) {
+                selectArticle(window.__currentArticleId);
+            }
+        });
+    </script>
+</body>
+</html>
