@@ -28,6 +28,8 @@
     noiseScale: 0.0016,          // 噪声空间尺度（屏坐标 -> 噪声坐标）
     diffusion: 0.055,            // 随机扩散强度（px/帧，破坏流线锁定，防止粒子聚成一条线）
     particleMaxAge: 10.0,        // 粒子最大寿命（秒），到期随机重置位置保持分布均匀
+    fadeOutDuration: 1.2,        // 渐隐时长（秒）：寿命结束前逐渐淡出
+    fadeInDuration: 0.8,         // 渐入时长（秒）：重置后逐渐淡入
     reducedMotion: false         // 是否尊重 prefers-reduced-motion
   };
 
@@ -139,17 +141,32 @@
     this.trail = [];
     this.baseAlpha = CONFIG.maxAlpha * (0.5 + Math.random() * 0.5);
     this.alpha = this.baseAlpha;
-    // 错开各粒子的年龄，避免同时到期集体重置造成闪烁
-    this.age = Math.random() * CONFIG.particleMaxAge;
+    // 渐隐因子（1 = 完全可见，0 = 消失）：
+    // 临近寿命时线性衰减到 0，到期重置后从 0 渐入，避免粒子突然消失/闪现
+    this.fadeFactor = 0;
+    // 每个粒子的寿命随机化（5~15 秒），避免所有粒子同一时刻重置造成闪烁；
+    // age 从 0 开始，保证重生后按 fadeInDuration 从透明淡入
+    this.lifespan = CONFIG.particleMaxAge * (0.5 + Math.random() * 0.5);
+    this.age = 0;
   };
 
   Particle.prototype.step = function (canvas, mouse, dt) {
     // 寿命管理：粒子到期后随机重置位置，防止长时间运行后
     // 全部粒子被锁死在同一条流线轨道上（"练成一条线"问题）
     this.age += dt;
-    if (this.age >= CONFIG.particleMaxAge) {
+    if (this.age >= this.lifespan) {
       this.reset(canvas);
       return;
+    }
+
+    // 渐隐/渐入因子：临近寿命时淡出（剩余时间 < fadeOutDuration 线性衰减到 0），
+    // 刚重置时淡入（age 越小越接近 0 透明度），消失与重生平滑过渡
+    var remaining = this.lifespan - this.age;
+    if (remaining < CONFIG.fadeOutDuration) {
+      this.fadeFactor = Math.max(0, remaining / CONFIG.fadeOutDuration);
+    } else {
+      // 重生后的淡入（前 fadeInDuration 秒内从 0 渐入）
+      this.fadeFactor = Math.min(1, this.age / CONFIG.fadeInDuration + 0.01);
     }
 
     // 0. 随机扩散：轻微随机扰动破坏流线锁定，让粒子缓慢换轨
@@ -248,7 +265,8 @@
     // 显式 for 循环，保持可读性
     for (var i = 0; i < n - 1; i++) {
       var t = i / (n - 1);
-      var alpha = this.alpha * t * t;            // 旧拖尾更快淡出
+      // fadeFactor：粒子寿命渐隐/渐入整体透明度（消失/重生平滑过渡）
+      var alpha = this.alpha * this.fadeFactor * t * t;   // 旧拖尾更快淡出
       var bucket = Math.min(
         ALPHA_BUCKETS - 1,
         Math.floor(alpha / (CONFIG.maxAlpha * 1.35) * ALPHA_BUCKETS)
