@@ -26,6 +26,8 @@
     swirlStrength: 6.0,          // 涡旋切向速度峰值（px/帧）
     baseSpeed: 1.3,              // 背景流场速度系数
     noiseScale: 0.0016,          // 噪声空间尺度（屏坐标 -> 噪声坐标）
+    diffusion: 0.055,            // 随机扩散强度（px/帧，破坏流线锁定，防止粒子聚成一条线）
+    particleMaxAge: 10.0,        // 粒子最大寿命（秒），到期随机重置位置保持分布均匀
     reducedMotion: false         // 是否尊重 prefers-reduced-motion
   };
 
@@ -137,14 +139,29 @@
     this.trail = [];
     this.baseAlpha = CONFIG.maxAlpha * (0.5 + Math.random() * 0.5);
     this.alpha = this.baseAlpha;
+    // 错开各粒子的年龄，避免同时到期集体重置造成闪烁
+    this.age = Math.random() * CONFIG.particleMaxAge;
   };
 
   Particle.prototype.step = function (canvas, mouse, dt) {
+    // 寿命管理：粒子到期后随机重置位置，防止长时间运行后
+    // 全部粒子被锁死在同一条流线轨道上（"练成一条线"问题）
+    this.age += dt;
+    if (this.age >= CONFIG.particleMaxAge) {
+      this.reset(canvas);
+      return;
+    }
+
+    // 0. 随机扩散：轻微随机扰动破坏流线锁定，让粒子缓慢换轨
+    //    （扩散远小于流场速度，视觉上几乎不可察觉，但能保证长期分布均匀）
+    var diffuseX = (Math.random() - 0.5) * CONFIG.diffusion;
+    var diffuseY = (Math.random() - 0.5) * CONFIG.diffusion;
+
     // 1. 背景流场（Perlin curl noise）
     var field = curlNoise(this.x * CONFIG.noiseScale, this.y * CONFIG.noiseScale);
 
-    var vx = field.x * CONFIG.baseSpeed;
-    var vy = field.y * CONFIG.baseSpeed;
+    var vx = field.x * CONFIG.baseSpeed + diffuseX;
+    var vy = field.y * CONFIG.baseSpeed + diffuseY;
 
     // 2. 涡旋叠加（Rankine，逆时针）
     //    涡旋中心 = 光标静止位置（vortexX/vortexY），强度 = vortexIntensity（0~1 平滑渐变）
