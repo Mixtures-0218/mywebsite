@@ -1,0 +1,81 @@
+{
+  "source": "NOAA / NCEP GFS",
+  "sourceUrl": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.20261020/00/atmos/gfs.t00z.pgrb2.1p00.f000",
+  "inventoryUrl": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.20261020/00/atmos/gfs.t00z.pgrb2.1p00.f000.idx",
+  "cycle": "2026-10-20T00:00:00Z",
+  "validTime": "2026-10-20T00:00:00Z",
+  "forecastHour": 0,
+  "pressureLevelHpa": 500,
+  "units": "m/s",
+  "grid": {
+    "Ni": 360,
+    "Nj": 181,
+    "latitudeOfFirstGridPointInDegrees": 90.0,
+    "longitudeOfFirstGridPointInDegrees": 0.0,
+    "latitudeOfLastGridPointInDegrees": -90.0,
+    "longitudeOfLastGridPointInDegrees": 359.0,
+    "iDirectionIncrementInDegrees": 1.0,
+    "jDirectionIncrementInDegrees": 1.0,
+    "iScansNegatively": 0,
+    "jScansPositively": 0,
+    "radius": 6371229,
+    "dataDate": 20261020,
+    "dataTime": 0,
+    "validityDate": 20261020,
+    "validityTime": 0
+  },
+  "binaryFile": "wind-500.bin",
+  "binaryFormat": "Interleaved little-endian float32 u,v; high-terrain gaps filled by bilinear interpolation",
+  "sha256": "e4aeec4210d2d4ee28cfb745021a8057d4cd191dc7ab919dc14c773c30d71ac7",
+  "validGridPoints": 65160,
+  "maskedGridPoints": 0,
+  "speedRange": [
+    0.04256628747109792,
+    71.7076333332268
+  ],
+  "processing": "ecCodes 2.50.0; original wind precision preserved as float32 outside documented interpolated terrain cells",
+  "records": [
+    {
+      "field": "u",
+      "inventoryRecord": "356:22381358:d=2026102000:UGRD:500 mb:anl:",
+      "byteRange": [
+        22381358,
+        22433256
+      ],
+      "sha256": "3aa36e25ff2ecdf57b99f64b82b7c45bcfae50693117dcf1a66167a248f8b262",
+      "units": "m s**-1"
+    },
+    {
+      "field": "v",
+      "inventoryRecord": "357:22433257:d=2026102000:VGRD:500 mb:anl:",
+      "byteRange": [
+        22433257,
+        22486717
+      ],
+      "sha256": "a4d99e47f6885d3655af639fa831af27c5b62af7223ba989036d6083f36ff829",
+      "units": "m s**-1"
+    },
+    {
+      "field": "pressure",
+      "inventoryRecord": "561:33534243:d=2026102000:PRES:surface:anl:",
+      "byteRange": [
+        33534243,
+        33608902
+      ],
+      "sha256": "16381d9217565d8c07a051aa2ec92fbc66a61e88bfde51579c069a562708467b",
+      "units": "Pa"
+    }
+  ],
+  "terrainHandling": "Source cells with surface pressure < 50000 Pa are filled by bilinear interpolation from four valid surrounding corners",
+  "sourceValidGridPoints": 65159,
+  "interpolatedGridPoints": 1,
+  "interpolationRecords": [
+    {
+      "longitude": 87,
+      "latitude": 28,
+      "u": 6.582433700561523,
+      "v": 3.150177001953125,
+      "method": "Bilinear interpolation at centre of four valid diagonal neighbours"
+    }
+  ]
+}

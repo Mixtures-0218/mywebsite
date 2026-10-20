@@ -1,0 +1,35 @@
+{
+  "view": {
+    "longitude": 130,
+    "latitude": 55
+  },
+  "coordinateSource": "https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_50m_populated_places_simple.geojson",
+  "cities": [
+    {
+      "name": "Seattle",
+      "role": "Undergraduate",
+      "longitude": -122.315322,
+      "latitude": 47.600423,
+      "nameZh": "西雅图",
+      "roleZh": "本科所在地",
+      "description": {
+        "en": "Seattle sits between Puget Sound and Lake Washington in the Pacific Northwest. It is where I pursue my undergraduate studies at the University of Washington.",
+        "zh": "西雅图位于美国太平洋西北地区，坐落在普吉特海湾与华盛顿湖之间。我在这里的华盛顿大学攻读本科。"
+      },
+      "descriptionSource": "https://depts.washington.edu/bpsd/prospective-students-2/seattle/"
+    },
+    {
+      "name": "Chengdu",
+      "role": "Hometown",
+      "longitude": 104.068074,
+      "latitude": 30.671946,
+      "nameZh": "成都",
+      "roleZh": "家乡",
+      "description": {
+        "en": "Chengdu, my hometown, is the capital of Sichuan Province in southwestern China, on the western edge of the Sichuan Basin. It is famous for pandas and hotpot.",
+        "zh": "成都是我的家乡，也是中国西南地区四川省的省会，位于四川盆地西缘。这里以熊猫和火锅闻名。"
+      },
+      "descriptionSource": "https://perth.wa.gov.au/-/media/Project/COP/COP/COP/Documents-and-Forms/Develop/Documents/Future-Perth/Documents/Think-Perth/City-of-Perth---Sister-Cities.PDF"
+    }
+  ]
+}
