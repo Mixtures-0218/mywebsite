@@ -126,26 +126,28 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="assets/css/subpages.css">
 </head>
 <body>
     <canvas id="windFieldCanvas"></canvas>
 
     <div class="container">
-        <div class="language-toggle">
-            <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
-            <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+        <div class="page-topbar">
+            <div class="language-toggle">
+                <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
+                <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+            </div>
+            <nav class="nav" aria-label="Page navigation">
+                <a href="Home.html#content"><span class="text" data-zh="返回内容" data-en="Back to Content">Back to Content</span></a>
+                <a href="article.html"><span class="text" data-zh="科普文章" data-en="Articles">Articles</span></a>
+                <a href="Home.html"><span class="text" data-zh="主页" data-en="Home">Home</span></a>
+                <a href="app.html"><span class="text" data-zh="应用" data-en="Apps">Apps</span></a>
+            </nav>
         </div>
 
         <div class="header">
             <h1 class="text" data-zh="气象科普视频" data-en="Meteorological Videos">Meteorological Videos</h1>
             <p class="text" data-zh="用生动的动画讲解天气现象背后的科学" data-en="Explaining the science behind weather phenomena with vivid animations">Explaining the science behind weather phenomena with vivid animations</p>
-        </div>
-
-        <div class="nav">
-            <a href="Home.html#content"><span class="text" data-zh="返回内容" data-en="Back to Content">Back to Content</span></a>
-            <a href="article.html"><span class="text" data-zh="科普文章" data-en="Articles">Articles</span></a>
-            <a href="Home.html"><span class="text" data-zh="主页" data-en="Home">Home</span></a>
-            <a href="app.html"><span class="text" data-zh="应用" data-en="Apps">Apps</span></a>
         </div>
 
         <!-- 视频网格由 JS 渲染 -->

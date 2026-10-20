@@ -44,26 +44,28 @@
             margin-bottom: 12px;
         }
     </style>
+    <link rel="stylesheet" href="assets/css/subpages.css">
 </head>
 <body>
     <canvas id="windFieldCanvas"></canvas>
 
     <div class="container">
-        <div class="language-toggle">
-            <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
-            <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+        <div class="page-topbar">
+            <div class="language-toggle">
+                <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
+                <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+            </div>
+            <nav class="nav" aria-label="Page navigation">
+                <a href="Home.html#content"><span class="text" data-zh="返回内容" data-en="Back to Content">Back to Content</span></a>
+                <a href="视频_new.html"><span class="text" data-zh="所有视频" data-en="All Videos">All Videos</span></a>
+                <a href="article.html"><span class="text" data-zh="科普文章" data-en="Articles">Articles</span></a>
+                <a href="Home.html"><span class="text" data-zh="主页" data-en="Home">Home</span></a>
+                <a href="app.html"><span class="text" data-zh="应用" data-en="Apps">Apps</span></a>
+            </nav>
         </div>
 
         <div class="header" style="padding-bottom: 20px;">
             <h1 class="text" data-zh="日晕" data-en="Solar Halo">Solar Halo</h1>
-        </div>
-
-        <div class="nav">
-            <a href="Home.html#content"><span class="text" data-zh="返回内容" data-en="Back to Content">Back to Content</span></a>
-            <a href="视频_new.html"><span class="text" data-zh="所有视频" data-en="All Videos">All Videos</span></a>
-            <a href="article.html"><span class="text" data-zh="科普文章" data-en="Articles">Articles</span></a>
-            <a href="Home.html"><span class="text" data-zh="主页" data-en="Home">Home</span></a>
-            <a href="app.html"><span class="text" data-zh="应用" data-en="Apps">Apps</span></a>
         </div>
 
         <div class="video-player">

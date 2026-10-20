@@ -1,0 +1,212 @@
+/* Visual theme for the pages reachable from Home.html. WindField stays unchanged. */
+:root {
+    color-scheme: dark;
+    background: #000;
+    font-synthesis: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    background: #000;
+    color: #f4f7fb;
+}
+
+/* A quiet blue glow behind the existing transparent wind canvas. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 65vw 70vh at 76% 26%, #102e5b 0%, #081e40 35%, rgba(4, 15, 34, 0.88) 60%, transparent 88%);
+}
+
+.container {
+    max-width: 1320px;
+    padding: 0 5.5%;
+}
+
+a, button { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; }
+a:focus-visible, button:focus-visible {
+    outline: 2px solid #afd9ff;
+    outline-offset: 5px;
+}
+
+.page-topbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 30px 0 26px;
+}
+
+.language-toggle {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px;
+    border-radius: 100px;
+}
+
+.language-btn {
+    padding: 9px 15px;
+    border-radius: 100px;
+    color: #a8b7c7;
+    font-size: 12px;
+    transition: background 180ms, color 180ms;
+}
+
+.language-btn.active {
+    color: #fff;
+    background: rgba(210, 231, 252, 0.14);
+    box-shadow: inset 0 1px 0 #ffffff18, 0 2px 7px #0005;
+}
+
+.nav {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.nav a, .btn, .back-btn, .download-btn {
+    padding: 10px 18px;
+    border: 1px solid #d5eaff26;
+    border-radius: 100px;
+    color: #d0e5f5;
+    background: #ffffff07;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-decoration: none;
+    transition: background 180ms, border-color 180ms, transform 180ms;
+}
+
+.nav a:hover, .btn:hover, .back-btn:hover, .download-btn:hover {
+    background: #ffffff13;
+    border-color: #c8e5ff4a;
+    box-shadow: none;
+    transform: translateY(-2px);
+}
+
+.header {
+    text-align: left;
+    padding: 46px 0 38px;
+    animation: none;
+}
+
+.header h1 {
+    max-width: 1000px;
+    margin-bottom: 20px;
+    color: #f4f7fb;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    text-shadow: none;
+    font-size: clamp(40px, 5vw, 68px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.045em;
+    overflow-wrap: break-word;
+}
+
+html[lang="zh"] .header h1 { letter-spacing: 0.025em; }
+.header p {
+    max-width: 700px;
+    margin: 0;
+    color: #95a7ba;
+    font-size: 14px;
+    line-height: 1.8;
+    opacity: 1;
+}
+
+.language-toggle, .glass-card, .video-card, .video-desc, .article-card, .article-content, .app-card {
+    background: linear-gradient(135deg, rgba(19, 35, 56, 0.30), rgba(8, 17, 31, 0.16));
+    border: 1px solid rgba(213, 231, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), inset 0 -1px 0 rgba(255, 255, 255, 0.025), 0 22px 70px rgba(0, 0, 0, 0.24);
+    -webkit-backdrop-filter: blur(10px) saturate(115%);
+    backdrop-filter: blur(10px) saturate(115%);
+}
+
+.glass-card, .video-card, .video-desc, .article-card, .article-content, .app-card {
+    border-radius: 28px;
+}
+
+.glass-card, .video-desc, .article-card, .article-content, .app-card { padding: 31px; }
+.video-card, .article-card, .glass-card {
+    transition: transform 220ms, border-color 220ms, background 220ms;
+}
+.video-card:hover, .article-card:hover, .glass-card:hover {
+    transform: translateY(-5px);
+    border-color: #c8e5ff4a;
+    background: linear-gradient(135deg, rgba(26, 46, 69, 0.38), rgba(11, 23, 39, 0.22));
+    box-shadow: inset 0 1px 0 #ffffff21, 0 22px 70px #0000003d;
+}
+
+.video-grid, .article-list { gap: 22px; margin-top: 16px; }
+.video-info { padding: 22px 24px 25px; }
+.video-title { color: #e0e9f2; font-size: 16px; font-weight: 500; line-height: 1.5; }
+.video-sub { color: #92a3b6; font-size: 12px; opacity: 1; }
+.video-thumb-wrap, .video-player video { background: #030b18; }
+.video-player { border-radius: 28px; border-color: #d5eaff26; background: #0008; }
+.video-desc h2, .glass-card h2, .article-content h2, .app-card h2 {
+    text-align: left;
+    color: #e0e9f2;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+}
+.video-desc p, .glass-card p, .article-content p, .app-text {
+    color: #d0d8e3;
+    font-size: 14px;
+    line-height: 1.9;
+    opacity: 1;
+}
+.video-desc a, .app-links a { color: #b8d8ee; text-underline-offset: 4px; }
+.article-card { text-align: left; }
+.article-card::before { content: none; }
+.article-icon { font-size: 29px; margin-bottom: 24px; filter: none; }
+.article-title { color: #e0e9f2; font-size: 22px; font-weight: 500; letter-spacing: -0.025em; }
+.article-description { color: #92a3b6; font-size: 13px; line-height: 1.8; opacity: 1; }
+.article-date { color: #829bb4; font-size: 11px; opacity: 1; }
+.article-content { max-width: 960px; margin: 20px auto; }
+.article-content .article-date { margin-bottom: 24px; }
+.article-figure { opacity: 1; }
+.article-figure p { color: #92a3b6; font-size: 12px; }
+.app-card h3 { color: #95a7ba; font-size: 14px; line-height: 1.8; opacity: 1; }
+.divider { height: 1px; background: #d6eaff20; }
+
+.footer {
+    text-align: left;
+    margin-top: 80px;
+    padding: 30px 0 37px;
+    border-top: 1px solid #d6eaff13;
+    color: #74879a;
+    font-size: 11px;
+    line-height: 1.85;
+    opacity: 1;
+}
+.footer p { margin: 4px 0; }
+.footer a { color: #92a9bd; text-underline-offset: 3px; }
+
+@media (max-width: 768px) {
+    body::before { background: radial-gradient(ellipse 100vw 65vh at 82% 22%, #102e5b 0%, #081e40 35%, rgba(4, 15, 34, 0.88) 60%, transparent 88%); }
+    .container { padding: 0 6%; }
+    .page-topbar { gap: 14px; padding: 25px 0 15px; }
+    .language-btn { padding: 8px 12px; font-size: 11px; }
+    .nav { gap: 7px; }
+    .nav a { padding: 9px 13px; font-size: 11px; }
+    .header { padding: 36px 0 27px; }
+    .header h1 { font-size: clamp(35px, 8vw, 52px); }
+    .header p { font-size: 13px; }
+    .glass-card, .video-desc, .article-card, .article-content, .app-card { padding: 25px; border-radius: 25px; }
+    .video-card, .video-player { border-radius: 25px; }
+    .video-grid, .article-list { grid-template-columns: minmax(0, 1fr); gap: 17px; }
+    .video-info { padding: 20px 22px 23px; }
+    .footer { margin-top: 60px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav a, .btn, .back-btn, .download-btn, .video-card, .article-card, .glass-card, .video-thumb-wrap img, .play-overlay, .play-overlay::after { transition: none; }
+}

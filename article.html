@@ -140,27 +140,30 @@
             display: block;
         }
     </style>
+    <link rel="stylesheet" href="assets/css/subpages.css">
 </head>
 <body>
     <canvas id="windFieldCanvas"></canvas>
 
     <div class="container">
-        <!-- 语言切换 -->
-        <div class="language-toggle">
-            <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
-            <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+        <div class="page-topbar">
+            <div class="language-toggle">
+                <button class="language-btn" data-lang="zh" onclick="switchLanguage('zh', this)">中文</button>
+                <button class="language-btn active" data-lang="en" onclick="switchLanguage('en', this)">English</button>
+            </div>
+            <nav class="nav" aria-label="Page navigation">
+                <a href="Home.html#content"><span class="text" data-zh="返回内容" data-en="Back to Content">Back to Content</span></a>
+                <a id="all-articles-link" href="article.html" hidden onclick="showArticleList(); return false;"><span class="text" data-zh="所有文章" data-en="All Articles">All Articles</span></a>
+                <a href="视频_new.html"><span class="text" data-zh="科普视频" data-en="Videos">Videos</span></a>
+                <a href="Home.html"><span class="text" data-zh="主页" data-en="Home">Home</span></a>
+                <a href="app.html"><span class="text" data-zh="应用" data-en="Apps">Apps</span></a>
+            </nav>
         </div>
 
+        <!-- 语言切换 -->
         <div class="header">
             <h1 class="text" data-zh="博客文章" data-en="Blog Articles">Blog Articles</h1>
             <p class="text" data-zh="探索气象科学与数据科学的前沿知识" data-en="Exploring the frontiers of meteorological and data sciences">Exploring the frontiers of meteorological and data sciences</p>
-        </div>
-
-        <div class="nav">
-            <a href="Home.html#content"><span class="text" data-zh="返回内容" data-en="Back to Content">Back to Content</span></a>
-            <a href="视频_new.html"><span class="text" data-zh="科普视频" data-en="Videos">Videos</span></a>
-            <a href="Home.html"><span class="text" data-zh="主页" data-en="Home">Home</span></a>
-            <a href="app.html"><span class="text" data-zh="应用" data-en="Apps">Apps</span></a>
         </div>
 
         <!-- 文章列表 -->
@@ -306,6 +309,7 @@
             // 切换视图
             document.getElementById('article-list-section').classList.remove('active');
             document.getElementById('article-content-details').classList.add('active');
+            document.getElementById('all-articles-link').hidden = false;
             window.scrollTo(0, 0);
         }
 
@@ -313,6 +317,7 @@
         function showArticleList() {
             document.getElementById('article-list-section').classList.add('active');
             document.getElementById('article-content-details').classList.remove('active');
+            document.getElementById('all-articles-link').hidden = true;
             window.scrollTo(0, 0);
         }
 
